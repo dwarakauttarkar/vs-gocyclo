@@ -11,12 +11,15 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", () => {
 		vscode.window.showInformationMessage("Yeah the complexity is 20 for selected lines")
 	}))
-
+	
 	context.subscriptions.push(vscode.commands.registerCommand("gocyclo.toggleStatus", () => {
 		showStatusBar = !showStatusBar;
 		updateStatusBarItem();
 	}))
-
+	
+	// TODO 
+	// 1. Install gocyclo cli in gopath.
+	
 	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 	statusBarItem.command = 'gocyclo.runGoCycle'
 	context.subscriptions.push(statusBarItem);
