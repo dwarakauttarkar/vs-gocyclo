@@ -1,4 +1,4 @@
-# gocyclo README
+# vs-gocyclo README
 
 This is the README for your extension "gocyclo". After writing up a brief description, we recommend including the following sections.
 
