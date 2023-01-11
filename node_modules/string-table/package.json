@@ -1,0 +1,22 @@
+{
+  "name": "string-table",
+  "version": "0.1.5",
+  "description": "Format an array of data objects as a textual table",
+  "main": "stringTable.js",
+  "scripts": {
+    "test": "jasmine-node --coffee spec/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dtao/stringTable.js.git"
+  },
+  "author": "Dan Tao",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/dtao/stringTable.js/issues"
+  },
+  "dependencies": {
+    "colors": ">= 0.6.2"
+  }
+}

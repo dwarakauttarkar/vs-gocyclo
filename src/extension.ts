@@ -1,68 +1,116 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as child from 'child_process';
 
+var stringTable = require('string-table');
+
+// Global UI Components
 let statusBarItem: vscode.StatusBarItem;
-let showStatusBar: boolean;
+let outputChannel: vscode.OutputChannel;
+
+let showStatusBar: boolean = true;
+let averageComplexity: string;
+let goPath: string;
+
+// commands
+const commandToggleStatus = "gocyclo.toggleStatus";
+const commandTotalComplexity = "gocyclo.getTotalComplexity";
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "gocyclo" is now active!!!');
-
 	context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", () => {
-		vscode.window.showInformationMessage("Yeah the complexity is 20 for selected lines")
-	}))
+		vscode.window.showInformationMessage("Yeah the complexity is 20 for selected lines");
+	}));
 	
-	context.subscriptions.push(vscode.commands.registerCommand("gocyclo.toggleStatus", () => {
+	context.subscriptions.push(vscode.commands.registerCommand(commandToggleStatus, () => {
 		showStatusBar = !showStatusBar;
 		updateStatusBarItem();
-	}))
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand(commandTotalComplexity, () => {
+		showTotalComplexityInTerminal();
+	}));
 	
 	// TODO 
-	// 1. Install gocyclo cli in gopath.
+	setup();
 	
 	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-	statusBarItem.command = 'gocyclo.runGoCycle'
-	context.subscriptions.push(statusBarItem);
+	statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
+	statusBarItem.command = commandTotalComplexity;
 
+	context.subscriptions.push(statusBarItem);
 	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(updateStatusBarItem));
 	context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(updateStatusBarItem));
-
-	showStatusBar = true;
 	updateStatusBarItem();
-
 }
 
 function updateStatusBarItem(): void{
 	if(!showStatusBar){
 		statusBarItem.hide();
-		return
+		return;
 	}
-	const n = getComplexityForSelectedText(vscode.window.activeTextEditor);
-
-	statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground')
-	if(n > 0){
-		statusBarItem.text = 'Cyclomatic complexity of selected text is: ' + n;
-		statusBarItem.show();
-	}else{
-		statusBarItem.text = 'Cyclomatic complexity of this GO file is: ' + getTotalLinesInFile(vscode.window.activeTextEditor);
-		statusBarItem.show();
+	if(vscode.window.activeTextEditor){
+		let fileExt = vscode.window.activeTextEditor.document.uri.fsPath.split(".").pop();
+		if(fileExt !== "go"){
+			statusBarItem.hide();
+			return;
+		}
 	}
+	publishAverageComplexityToStatusBar();
 }
 
 export function deactivate() {}
 
-function getComplexityForSelectedText(editor: vscode.TextEditor | undefined): number {
-	let lines = 0;
-	if(editor){
-		lines = editor.selections.reduce((prev,curr) => prev + (curr.end.line - curr.start.line), 0)
+function publishAverageComplexityToStatusBar(){
+	let f:string = "";
+	if (vscode.window.activeTextEditor){
+		f = vscode.window.activeTextEditor.document.uri.fsPath;
 	}
-	return lines;
+	
+	let command = goPath+"/bin/gocyclo -avg "+f;
+	child.exec(command, function(error,stdout,stdin){
+		let avgScoreObj=JSON.parse(stdout);
+		averageComplexity  = avgScoreObj.average;
+		statusBarItem.text = '$(getting-started-beginner) Cyclomatic complexity: ' + averageComplexity;
+		statusBarItem.tooltip = "Click here to get function level analysis";
+		statusBarItem.show();
+	});
 }
 
-function getTotalLinesInFile(editor: vscode.TextEditor | undefined): number {
-	let totLines = 0;
-	if(editor){
-		totLines = editor.document.lineCount;
+function setup(){	
+	// installing go cyclo if not already available
+	child.exec('go install github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@0904f3d', function(error,stdout,stdin){
+		if(error !== null){
+			console.error(error);
+		}
+		console.log("setup goCyclo completed", stdout);
+	});
+
+	// setting up go path in global variable
+	let workspace = vscode.workspace.getConfiguration();
+	let allAsJSON = JSON.parse(JSON.stringify(workspace));
+	goPath = allAsJSON.go.gopath;
+}
+
+function showTotalComplexityInTerminal(){
+	let f:string = "";
+	if (vscode.window.activeTextEditor){
+		f = vscode.window.activeTextEditor.document.uri.fsPath;
 	}
-	return totLines;
+
+	let command = goPath+"/bin/gocyclo -top 1000 "+f;
+	child.exec(command, function(error,stdout,stdin){
+		const stats : Stat[] = JSON.parse(stdout);
+		console.table(stats);
+		if(outputChannel === undefined || outputChannel === null){
+			outputChannel = vscode.window.createOutputChannel("GoCyclo");
+		}
+		outputChannel.clear();
+		outputChannel.appendLine("Function Level Analysis \n");
+		let out:string = stringTable.create(stats, {
+			headers: ['PkgName', 'FuncName', 'Complexity'],
+			capitalizeHeaders: true,
+
+		});
+		outputChannel.appendLine(out);
+		outputChannel.show();
+	});
 }
