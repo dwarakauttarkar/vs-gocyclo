@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = require("vscode");
 const child = require("child_process");
+const threshold_1 = require("./cyclomatic/threshold");
 var stringTable = require('string-table');
 // Global UI Components
 let statusBarItem;
@@ -24,7 +25,6 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand(commandTotalComplexity, () => {
         showTotalComplexityInTerminal();
     }));
-    // TODO 
     setup();
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
@@ -58,25 +58,33 @@ function publishAverageComplexityToStatusBar() {
     }
     let command = goPath + "/bin/gocyclo -avg " + f;
     child.exec(command, function (error, stdout, stdin) {
-        let avgScoreObj = JSON.parse(stdout);
-        averageComplexity = avgScoreObj.average;
-        statusBarItem.text = '$(getting-started-beginner) Cyclomatic complexity: ' + averageComplexity;
-        statusBarItem.tooltip = "Click here to get function level analysis";
-        statusBarItem.show();
+        try {
+            let avgScoreObj = JSON.parse(stdout);
+            averageComplexity = avgScoreObj.average;
+            statusBarItem.text = '$(getting-started-beginner) Avg Cyclomatic complexity: ' + averageComplexity;
+            statusBarItem.tooltip = "Click here to get function level analysis";
+            statusBarItem.show();
+        }
+        catch (exception) {
+            console.error(exception);
+            vscode.window.showErrorMessage(JSON.stringify(exception));
+        }
     });
 }
 function setup() {
-    // installing go cyclo if not already available
-    child.exec('go install github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@0904f3d', function (error, stdout, stdin) {
-        if (error !== null) {
-            console.error(error);
-        }
-        console.log("setup goCyclo completed", stdout);
-    });
     // setting up go path in global variable
     let workspace = vscode.workspace.getConfiguration();
     let allAsJSON = JSON.parse(JSON.stringify(workspace));
     goPath = allAsJSON.go.gopath;
+    // installing go cyclo if not already available
+    child.exec('go install github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest', function (error, stdout, stdin) {
+        if (error !== undefined) {
+            console.error(error);
+        }
+        else {
+            console.log("setup goCyclo completed");
+        }
+    });
 }
 function showTotalComplexityInTerminal() {
     let f = "";
@@ -86,14 +94,19 @@ function showTotalComplexityInTerminal() {
     let command = goPath + "/bin/gocyclo -top 1000 " + f;
     child.exec(command, function (error, stdout, stdin) {
         const stats = JSON.parse(stdout);
-        console.table(stats);
+        for (let i = 0; i < stats.length; i++) {
+            stats[i].Remark = (0, threshold_1.getCyclomaticThresholdDescription)(stats[i].Complexity);
+        }
         if (outputChannel === undefined || outputChannel === null) {
             outputChannel = vscode.window.createOutputChannel("GoCyclo");
         }
         outputChannel.clear();
-        outputChannel.appendLine("Function Level Analysis \n");
+        outputChannel.appendLine("Average Cyclomatic Complexity: " + averageComplexity + "\n");
+        outputChannel.appendLine("Thresholds:");
+        outputChannel.appendLine("[1-10: GOOD]; [11-20: MODERATE]; [21-30: COMPLEX]; [31-40: EXTREMELY COMPLEX]; [40+: INSANE !!!] \n");
+        outputChannel.appendLine("Function Level Analysis");
         let out = stringTable.create(stats, {
-            headers: ['PkgName', 'FuncName', 'Complexity'],
+            headers: ['PkgName', 'FuncName', 'Complexity', 'Remark'],
             capitalizeHeaders: true,
         });
         outputChannel.appendLine(out);
