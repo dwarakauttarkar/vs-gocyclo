@@ -4,29 +4,27 @@ This extension provides cyclomatic complexity for a go lang file.
 
 ## Features
 
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
 1. Shows the cyclomatic complexity of a go file.
+2. Prints total function level complexity in output channel.
 
 ## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 
 1. specify the gopath in `go.gopath` in the settings.json.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+1. Average complexity rendering is one key stroke lagging.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
 ### 1.0.0
 
-Initial release for the Plugin, only average complexity of the file is shown.
+* Initial release for the Plugin, only average complexity of the file is shown.
+
+### 1.0.1
+
+* Show total Complexity for the current file at function level when the status bar item at the bottom is clicked.
+* New Command "GoCyclo: Get Total Complexity" to generate the function level complexity.
 
 ---
 
