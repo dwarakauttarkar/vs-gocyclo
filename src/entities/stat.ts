@@ -16,8 +16,8 @@ export class FileStat  {
 }
 
 export enum Column{
-    PKGNAME = 'Package',
-    FUNCNAME = 'Function',
+    PKGNAME = 'PkgName',
+    FUNCNAME = 'FuncName',
     COMPLEXITY = 'Complexity',
     REMARK = 'Remark',
 }

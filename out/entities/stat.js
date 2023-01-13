@@ -24,8 +24,8 @@ class FileStat {
 exports.FileStat = FileStat;
 var Column;
 (function (Column) {
-    Column["PKGNAME"] = "Package";
-    Column["FUNCNAME"] = "Function";
+    Column["PKGNAME"] = "PkgName";
+    Column["FUNCNAME"] = "FuncName";
     Column["COMPLEXITY"] = "Complexity";
     Column["REMARK"] = "Remark";
 })(Column = exports.Column || (exports.Column = {}));

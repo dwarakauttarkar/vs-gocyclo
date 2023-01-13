@@ -20,8 +20,9 @@ const commandTotalComplexity = "gocyclo.getTotalComplexity";
 const goCycloBinaryPath = "/tmp/gocyclo/gocyclo";
 const goCycloLibraryGitUrl = "github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest";
 function activate(context) {
-    context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", () => {
-        vscode.window.showInformationMessage("Yeah the complexity is 20 for selected lines");
+    context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", (folderUri) => {
+        console.log(folderUri);
+        showTotalComplexityInTerminal(folderUri.path);
     }));
     context.subscriptions.push(vscode.commands.registerCommand(commandToggleStatus, () => {
         showStatusBar = !showStatusBar;
@@ -105,17 +106,14 @@ function setup() {
         }
     });
 }
-function showTotalComplexityInTerminal() {
-    let currentFilePath = "";
-    if (vscode.window.activeTextEditor) {
-        currentFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
-    }
+function showTotalComplexityInTerminal(currentFilePath = (0, utils_1.getActiveFilePath)()) {
     let command = goCycloBinaryPath + " -top 1000 " + currentFilePath;
     child.exec(command, function (error, stdout, stdin) {
         const stats = JSON.parse(stdout);
         for (let i = 0; i < stats.length; i++) {
             stats[i].Remark = (0, threshold_1.getCyclomaticThresholdDescription)(stats[i].Complexity);
         }
+        console.log(stats);
         outputChannel = getClearOutPutChannel();
         printTotalComplexityMetadata(outputChannel);
         outputChannel.appendLine("Function Level Analysis");

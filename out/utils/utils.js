@@ -4,7 +4,7 @@ exports.getActiveFilePath = void 0;
 const vscode = require("vscode");
 function getActiveFilePath() {
     if (vscode.window.activeTextEditor) {
-        return vscode.window.activeTextEditor.document.uri.fsPath;
+        return vscode.window.activeTextEditor.document.uri.path;
     }
     else {
         return "";
