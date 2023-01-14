@@ -1,6 +1,8 @@
 # vs-gocyclo README
 
+[NOTE: THIS EXTENSION IS IN BETA STAGE]
 This extension provides cyclomatic complexity for a go lang file.
+
 
 ## Features
 
