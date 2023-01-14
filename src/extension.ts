@@ -14,7 +14,6 @@ let outputChannel: vscode.OutputChannel;
 
 let showStatusBar: boolean = true;
 let averageComplexity: string;
-let goPath: string;
 var lastUpdatedTime: number = new Date().getTime();
 
 // commands
@@ -22,8 +21,9 @@ const commandToggleStatus = "gocyclo.toggleStatus";
 const commandTotalComplexity = "gocyclo.getTotalComplexity";
 
 // common constants
-const goCycloBinaryPath = "/tmp/gocyclo/gocyclo";
-const goCycloLibraryGitUrl = "github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest";
+const tempGoPath = "/tmp/tempgopath";
+var goCycloBinaryPath = `${tempGoPath}/bin/gocyclo`;
+var goCycloLibraryGitUrl = "github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest";
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", (folderUri: vscode.Uri) => {
@@ -54,7 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
 	updateStatusBar();
 }
 
-function isStatusBarShow():boolean{
+function isStatusBarShow(): boolean {
 	if (!showStatusBar) {
 		statusBarItem.hide();
 		return false;
@@ -73,20 +73,19 @@ function isStatusBarShow():boolean{
 
 
 function updateStatusBarItemWithTimeDelay(): void {
-	if(new Date().getTime() - lastUpdatedTime < 1500) {
+	if (new Date().getTime() - lastUpdatedTime < 1500) {
 		return;
 	}
 	updateStatusBar();
 }
 
-function publishAverageComplexityToStatusBar(): Error|null{
+function publishAverageComplexityToStatusBar(): Error | null {
 	let currentFilepath = getActiveFilePath();
 	let command = goCycloBinaryPath + " -avg " + currentFilepath;
-	
 	child.exec(command, function (error, stdout, stdin) {
-		if(error !== undefined) {
+		if (error !== undefined) {
 			if (categorizeChildProcessError(error) === ErrorType.BINARY_NOT_FOUND) {
-				console.error("gocyclo binary not found, initiating the setup",error);
+				console.error("gocyclo binary not found, initiating the setup. ", error);
 				setup();
 			}
 		}
@@ -107,49 +106,25 @@ function categorizeChildProcessError(err: child.ExecException | null): ErrorType
 	if (err === null) {
 		return ErrorType.UNKNOWN;
 	}
-	if(err.message.includes("No such file or directory") && err.message.includes("gocyclo")) {
-		return ErrorType.BINARY_NOT_FOUND;
+	const message = err.message.toLocaleLowerCase();
+	if (err.message.includes("No such file or directory") || err.message.includes("not found")) {
+		if (err.message.includes("gocyclo")) {
+			return ErrorType.BINARY_NOT_FOUND;
+		}
 	}
 	return ErrorType.UNKNOWN;
 }
 
 function setup() {
-	// setting up go path in global variable
-	let workspace = vscode.workspace.getConfiguration();
-	let allAsJSON = JSON.parse(JSON.stringify(workspace));
-	goPath = allAsJSON.go.gopath;
-
-	console.log("go path is: " + goPath);
-	// installing go cyclo if not already available
-	child.exec('go install ' + goCycloLibraryGitUrl, function (error, stdout, stdin) {
-		if (error !== undefined) {
-			console.error(error);
-			return;
-		} else {
-			console.log("setup goCyclo completed");
-		}
-	});
-	console.log("successfully installed gocyclo");
-	// creating tmp folder if not available
-	child.exec('mkdir -p /tmp/gocyclo', function (error, stdout, stdin) {
-		if (error !== undefined) {
-			console.error(error);
-			return;
-		} else {
-			console.log("setup tmp folder completed");
-		}
-	});
-	console.log("successfully created tmp folder");
-	// moving the gocyclo binary to tmp folder
-	child.exec('mv ' + goPath + '/bin/gocyclo /tmp/gocyclo', function (error, stdout, stdin) {
-		if (error !== undefined) {
-			console.error(error);
-			return;
-		} else {
-			console.log("setup tmp folder completed");
-		}
-	});
-	console.log("successfully moved gocyclo to tmp folder"); 
+	child.exec(`mkdir -p ${tempGoPath} && `
+		+ `export GOPATH=${tempGoPath} && `
+		+ `export GO111MODULE=on && `
+		+ `go install ${goCycloLibraryGitUrl}`, function (error, stdout, stdin) {
+			if (error !== undefined && error?.message !== undefined) {
+				console.error("setup gopath error", error);
+				return;
+			}
+		});
 	console.log("setup completed");
 }
 

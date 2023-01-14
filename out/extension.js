@@ -14,14 +14,14 @@ let statusBarItem;
 let outputChannel;
 let showStatusBar = true;
 let averageComplexity;
-let goPath;
 var lastUpdatedTime = new Date().getTime();
 // commands
 const commandToggleStatus = "gocyclo.toggleStatus";
 const commandTotalComplexity = "gocyclo.getTotalComplexity";
 // common constants
-const goCycloBinaryPath = "/tmp/gocyclo/gocyclo";
-const goCycloLibraryGitUrl = "github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest";
+const tempGoPath = "/tmp/tempgopath";
+var goCycloBinaryPath = `${tempGoPath}/bin/gocyclo`;
+var goCycloLibraryGitUrl = "github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest";
 function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", (folderUri) => {
         console.log(folderUri);
@@ -72,7 +72,7 @@ function publishAverageComplexityToStatusBar() {
     child.exec(command, function (error, stdout, stdin) {
         if (error !== undefined) {
             if (categorizeChildProcessError(error) === errors_1.ErrorType.BINARY_NOT_FOUND) {
-                console.error("gocyclo binary not found, initiating the setup", error);
+                console.error("gocyclo binary not found, initiating the setup. ", error);
                 setup();
             }
         }
@@ -93,50 +93,24 @@ function categorizeChildProcessError(err) {
     if (err === null) {
         return errors_1.ErrorType.UNKNOWN;
     }
-    if (err.message.includes("No such file or directory") && err.message.includes("gocyclo")) {
-        return errors_1.ErrorType.BINARY_NOT_FOUND;
+    const message = err.message.toLocaleLowerCase();
+    if (err.message.includes("No such file or directory") || err.message.includes("not found")) {
+        if (err.message.includes("gocyclo")) {
+            return errors_1.ErrorType.BINARY_NOT_FOUND;
+        }
     }
     return errors_1.ErrorType.UNKNOWN;
 }
 function setup() {
-    // setting up go path in global variable
-    let workspace = vscode.workspace.getConfiguration();
-    let allAsJSON = JSON.parse(JSON.stringify(workspace));
-    goPath = allAsJSON.go.gopath;
-    console.log("go path is: " + goPath);
-    // installing go cyclo if not already available
-    child.exec('go install ' + goCycloLibraryGitUrl, function (error, stdout, stdin) {
-        if (error !== undefined) {
-            console.error(error);
+    child.exec(`mkdir -p ${tempGoPath} && `
+        + `export GOPATH=${tempGoPath} && `
+        + `export GO111MODULE=on && `
+        + `go install ${goCycloLibraryGitUrl}`, function (error, stdout, stdin) {
+        if (error !== undefined && error?.message !== undefined) {
+            console.error("setup gopath error", error);
             return;
         }
-        else {
-            console.log("setup goCyclo completed");
-        }
     });
-    console.log("successfully installed gocyclo");
-    // creating tmp folder if not available
-    child.exec('mkdir -p /tmp/gocyclo', function (error, stdout, stdin) {
-        if (error !== undefined) {
-            console.error(error);
-            return;
-        }
-        else {
-            console.log("setup tmp folder completed");
-        }
-    });
-    console.log("successfully created tmp folder");
-    // moving the gocyclo binary to tmp folder
-    child.exec('mv ' + goPath + '/bin/gocyclo /tmp/gocyclo', function (error, stdout, stdin) {
-        if (error !== undefined) {
-            console.error(error);
-            return;
-        }
-        else {
-            console.log("setup tmp folder completed");
-        }
-    });
-    console.log("successfully moved gocyclo to tmp folder");
     console.log("setup completed");
 }
 function showTotalComplexityInTerminal(currentFilePath = (0, utils_1.getActiveFilePath)()) {
