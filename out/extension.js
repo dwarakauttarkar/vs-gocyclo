@@ -12,6 +12,7 @@ var stringTable = require('string-table');
 // Global UI Components
 let statusBarItem;
 let outputChannel;
+let terminal;
 let showStatusBar = true;
 let averageComplexity;
 var lastUpdatedTime = new Date().getTime();
@@ -102,15 +103,14 @@ function categorizeChildProcessError(err) {
     return errors_1.ErrorType.UNKNOWN;
 }
 function setup() {
-    child.exec(`mkdir -p ${tempGoPath} && `
-        + `export GOPATH=${tempGoPath} && `
+    if (terminal === undefined || terminal === null) {
+        terminal = vscode.window.createTerminal("GoCyclo");
+    }
+    terminal.sendText(`echo $GO111MODULE`, true);
+    terminal.sendText(`mkdir -p ${tempGoPath} && `
         + `export GO111MODULE=on && `
-        + `go install ${goCycloLibraryGitUrl}`, function (error, stdout, stdin) {
-        if (error !== undefined && error?.message !== undefined) {
-            console.error("setup gopath error", error);
-            return;
-        }
-    });
+        + `export GOPATH=${tempGoPath} && `
+        + `go install ${goCycloLibraryGitUrl}`, true);
     console.log("setup completed");
 }
 function showTotalComplexityInTerminal(currentFilePath = (0, utils_1.getActiveFilePath)()) {

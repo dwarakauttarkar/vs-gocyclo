@@ -11,6 +11,7 @@ var stringTable = require('string-table');
 // Global UI Components
 let statusBarItem: vscode.StatusBarItem;
 let outputChannel: vscode.OutputChannel;
+let terminal: vscode.Terminal;
 
 let showStatusBar: boolean = true;
 let averageComplexity: string;
@@ -116,15 +117,14 @@ function categorizeChildProcessError(err: child.ExecException | null): ErrorType
 }
 
 function setup() {
-	child.exec(`mkdir -p ${tempGoPath} && `
-		+ `export GOPATH=${tempGoPath} && `
-		+ `export GO111MODULE=on && `
-		+ `go install ${goCycloLibraryGitUrl}`, function (error, stdout, stdin) {
-			if (error !== undefined && error?.message !== undefined) {
-				console.error("setup gopath error", error);
-				return;
-			}
-		});
+	if(terminal === undefined || terminal === null){
+		terminal = vscode.window.createTerminal("GoCyclo");
+	}
+	terminal.sendText(`echo $GO111MODULE`, true);
+	terminal.sendText(`mkdir -p ${tempGoPath} && `
+	+ `export GO111MODULE=on && `	
+	+ `export GOPATH=${tempGoPath} && `
+		+ `go install ${goCycloLibraryGitUrl}`, true);
 	console.log("setup completed");
 }
 
