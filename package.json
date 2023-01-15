@@ -2,7 +2,7 @@
   "name": "vs-gocyclo",
   "displayName": "vs-gocyclo",
   "description": "vs extension for go code insights",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.74.0"
   },
