@@ -3,15 +3,38 @@
 [NOTE: THIS EXTENSION IS IN BETA STAGE]
 This extension provides cyclomatic complexity for a go lang file.
 
+### Limitations
+- Currently works only on Mac & Linux.
 
 ## Features
 
-1. Shows the cyclomatic complexity of a go file.
-2. Prints total function level complexity in output channel.
+### Shows the average cyclomatic complexity of a go file.
+![average](./images/3_average_for_current_file.jpeg)
 
-## Extension Settings
+---
 
-1. specify the gopath in `go.gopath` in the settings.json.
+### Get analysis of all functions in a file
+#### A)
+![all functions in file](./images/4_click_status_bar_item_for_func_analysis.png)
+
+#### B)
+![all functions in file](./images/4b_cick_sbi_to_get_file_average%20.png)
+
+---
+
+### Get package level analysis on right-clicking folder
+#### Right click the package/folder
+![package level analysis](./images/5_select_from_menu_right_click.png)
+
+#### Total complexity shown in output channel
+![package level analysis](./images/6_package_level_all_functions.png)
+
+---
+
+## Commands Available
+1. `GoCyclo: Run Go Cyclo` - Activates/Reloads the extenstion.
+2. `GoCyclo: Toggle Show/Hide Complexity Bar` - Show/Hide status bar item.
+3. `GoCyclo: Get Total Complexity` - Shows file level analysis for open file
 
 ## Known Issues
 

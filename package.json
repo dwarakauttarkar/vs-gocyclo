@@ -2,23 +2,20 @@
   "name": "vs-gocyclo",
   "displayName": "vs-gocyclo",
   "description": "vs extension for go code insights",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
     "Other"
   ],
+  "icon": "images/icon.png",
   "activationEvents": [
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "gocyclo.helloWorld",
-        "title": "GoCyclo: Hello World"
-      },
       {
         "command": "gocyclo.runGoCycle",
         "title": "GoCyclo: Run Go Cyclo"
