@@ -1,33 +1,35 @@
 # vs-gocyclo README
 
-[NOTE: THIS EXTENSION IS IN BETA STAGE]
 This extension provides cyclomatic complexity for a go lang file.
 
 ### Limitations
 - Currently works only on Mac & Linux.
 
+### Prerequisites
+- go lang version > 1.16 installed
+
 ## Features
 
 ### Shows the average cyclomatic complexity of a go file.
-![average](./images/3_average_for_current_file.jpeg)
+![average](images/3_average_for_current_file.jpeg)
 
 ---
 
 ### Get analysis of all functions in a file
 #### A)
-![all functions in file](./images/4_click_status_bar_item_for_func_analysis.png)
+![all functions in file](images/4_click_status_bar_item_for_func_analysis.png)
 
 #### B)
-![all functions in file](./images/4b_cick_sbi_to_get_file_average%20.png)
+![all functions in file](images/4b_cick_sbi_to_get_file_average%20.png)
 
 ---
 
 ### Get package level analysis on right-clicking folder
 #### Right click the package/folder
-![package level analysis](./images/5_select_from_menu_right_click.png)
+![package level analysis](images/5_select_from_menu_right_click.png)
 
 #### Total complexity shown in output channel
-![package level analysis](./images/6_package_level_all_functions.png)
+![package level analysis](images/6_package_level_all_functions.png)
 
 ---
 
