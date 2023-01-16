@@ -1,15 +1,23 @@
 {
   "name": "vs-gocyclo",
-  "displayName": "vs-gocyclo",
-  "description": "vs extension for go code insights",
-  "version": "0.1.0",
+  "displayName": "VS GoCyclo",
+  "description": "Extension for GO language code insights",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Other"
+    "Other", "Language Packs", "Linters"
   ],
   "icon": "images/icon.png",
+  "keywords": [
+    "go",
+    "golang",
+    "cyclomatic",
+    "complexity",
+    "code insights",
+    "code complexity"
+  ],
   "activationEvents": [
     "onStartupFinished"
   ],
@@ -65,5 +73,17 @@
     "type": "git",
     "url": "https://github.com/dwarakauttarkar/vs-gocyclo"
   },
-  "publisher": "dwarakautarkar"
+  "publisher": "dwarakautarkar",
+  "os": ["linux-x64", "linux-arm64", "darwin-x64", "darwin-arm64"],
+  "author": {
+    "name": "Dwaraka Uttarkar",
+    "email": "dwaraka.uttarkar@gmail.com"
+  },
+  "galleryBanner": {
+    "color": "#0078d7",
+    "theme": "dark"
+  },
+  "bugs": {
+    "url": "https://github.com/dwarakauttarkar/vs-gocyclo/issues"
+  }
 }
