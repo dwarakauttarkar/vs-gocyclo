@@ -1,8 +1,8 @@
 {
   "name": "vs-gocyclo",
-  "displayName": "VS GoCyclo",
+  "displayName": "Go Cyclo",
   "description": "Extension for GO language code insights",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "engines": {
     "vscode": "^1.74.0"
   },
