@@ -5,8 +5,8 @@ class Stat {
     constructor() {
         this.PkgName = "";
         this.FuncName = "";
-        this.Complexity = 0;
-        // Pos: FileStat = new FileStat();
+        this.CyclomaticComplexity = 0;
+        this.MaintainabilityIndex = 0;
         this.Remark = "";
         this.Name = "";
     }
@@ -26,7 +26,8 @@ var Column;
 (function (Column) {
     Column["PKGNAME"] = "PkgName";
     Column["FUNCNAME"] = "FuncName";
-    Column["COMPLEXITY"] = "Complexity";
+    Column["CYCLO_COMPLEXITY"] = "CyclomaticComplexity";
+    Column["MAINTAINABILITY_INDEX"] = "MaintainabilityIndex";
     Column["REMARK"] = "Remark";
 })(Column = exports.Column || (exports.Column = {}));
 //# sourceMappingURL=stat.js.map

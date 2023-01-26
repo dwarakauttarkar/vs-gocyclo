@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as child from 'child_process';
-import { getCyclomaticThresholdDescription } from './cyclomatic/threshold';
+import { getMaintainabilityRemark } from './cyclomatic/threshold';
 import { getActiveFilePath } from './utils/utils';
 import { Stat, Column } from './entities/stat';
 import { LanguageFileExtension } from './entities/language';
@@ -135,15 +135,18 @@ function showTotalComplexityInTerminal(currentFilePath: string = getActiveFilePa
 	child.exec(command, function (error, stdout, stdin) {
 		const stats: Stat[] = JSON.parse(stdout);
 		for (let i = 0; i < stats.length; i++) {
-			stats[i].Remark = getCyclomaticThresholdDescription(stats[i].Complexity)
+			stats[i].Remark = getMaintainabilityRemark(stats[i].MaintainabilityIndex)
 		}
 		console.log(stats);
 		outputChannel = getClearOutPutChannel();
-		printTotalComplexityMetadata(outputChannel);
+		printTotalCyclomaticMetadata(outputChannel);
+		printTotalMaintainabilityMetadata(outputChannel);
 		outputChannel.appendLine("Function Level Analysis");
 		let out: string = stringTable.create(stats, {
-			headers: [Column.PKGNAME, Column.FUNCNAME, Column.COMPLEXITY, Column.REMARK],
+			headers: [Column.PKGNAME, Column.FUNCNAME,
+				Column.CYCLO_COMPLEXITY, Column.MAINTAINABILITY_INDEX,  Column.REMARK],
 			capitalizeHeaders: true,
+
 		});
 		outputChannel.appendLine(out);
 		outputChannel.show();
@@ -158,10 +161,15 @@ function getClearOutPutChannel(): vscode.OutputChannel {
 	return outputChannel;
 }
 
-function printTotalComplexityMetadata(outputChannel: vscode.OutputChannel) {
+function printTotalCyclomaticMetadata(outputChannel: vscode.OutputChannel) {
 	outputChannel.appendLine("Average Cyclomatic Complexity: " + averageComplexity + "\n");
-	outputChannel.appendLine("Thresholds:");
-	outputChannel.appendLine("[1-10: GOOD]; [11-20: MODERATE]; [21-30: COMPLEX]; [31-40: EXTREMELY COMPLEX]; [40+: INSANE !] \n");
+	outputChannel.appendLine("Cyclomatic Complexity Thresholds:");
+	outputChannel.appendLine("1-10: GOOD | 11-20: MODERATE | 21-30: COMPLEX | 31-40: EXTREMELY COMPLEX | 40+: INSANE \n");
+}
+
+function printTotalMaintainabilityMetadata(outputChannel: vscode.OutputChannel) {
+	outputChannel.appendLine("Maintainability Index Thresholds:");
+	outputChannel.appendLine("1-20: INSANE | 21-40: EXTREMELY COMPLEX | 40-60: COMPLEX | 60-80: GOOD | 80+: EXCELLENT \n");
 }
 
 function updateStatusBar() {

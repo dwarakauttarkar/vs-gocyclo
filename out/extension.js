@@ -118,16 +118,19 @@ function showTotalComplexityInTerminal(currentFilePath = (0, utils_1.getActiveFi
     child.exec(command, function (error, stdout, stdin) {
         const stats = JSON.parse(stdout);
         for (let i = 0; i < stats.length; i++) {
-            stats[i].Remark = (0, threshold_1.getCyclomaticThresholdDescription)(stats[i].Complexity);
+            stats[i].Remark = (0, threshold_1.getMaintainabilityRemark)(stats[i].MaintainabilityIndex);
         }
         console.log(stats);
         outputChannel = getClearOutPutChannel();
-        printTotalComplexityMetadata(outputChannel);
+        printTotalCyclomaticMetadata(outputChannel);
+        printTotalMaintainabilityMetadata(outputChannel);
         outputChannel.appendLine("Function Level Analysis");
         let out = stringTable.create(stats, {
-            headers: [stat_1.Column.PKGNAME, stat_1.Column.FUNCNAME, stat_1.Column.COMPLEXITY, stat_1.Column.REMARK],
+            headers: [stat_1.Column.PKGNAME, stat_1.Column.FUNCNAME,
+                stat_1.Column.CYCLO_COMPLEXITY, stat_1.Column.MAINTAINABILITY_INDEX, stat_1.Column.REMARK],
             capitalizeHeaders: true,
         });
+        // console.log("out ", out);
         outputChannel.appendLine(out);
         outputChannel.show();
     });
@@ -139,10 +142,14 @@ function getClearOutPutChannel() {
     outputChannel.clear();
     return outputChannel;
 }
-function printTotalComplexityMetadata(outputChannel) {
+function printTotalCyclomaticMetadata(outputChannel) {
     outputChannel.appendLine("Average Cyclomatic Complexity: " + averageComplexity + "\n");
-    outputChannel.appendLine("Thresholds:");
-    outputChannel.appendLine("[1-10: GOOD]; [11-20: MODERATE]; [21-30: COMPLEX]; [31-40: EXTREMELY COMPLEX]; [40+: INSANE !] \n");
+    outputChannel.appendLine("Cyclomatic Complexity Thresholds:");
+    outputChannel.appendLine("1-10: GOOD | 11-20: MODERATE | 21-30: COMPLEX | 31-40: EXTREMELY COMPLEX | 40+: INSANE \n");
+}
+function printTotalMaintainabilityMetadata(outputChannel) {
+    outputChannel.appendLine("Maintainability Index Thresholds:");
+    outputChannel.appendLine("1-20: INSANE | 21-40: EXTREMELY COMPLEX | 40-60: COMPLEX | 60-80: GOOD | 80+: EXCELLENT \n");
 }
 function updateStatusBar() {
     if (!isStatusBarShow()) {

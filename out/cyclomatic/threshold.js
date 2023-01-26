@@ -1,23 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCyclomaticThresholdDescription = void 0;
-function getCyclomaticThresholdDescription(complexity) {
-    if (complexity <= 10) {
-        return "GOOD";
+exports.getMaintainabilityRemark = void 0;
+function getMaintainabilityRemark(complexity) {
+    if (complexity >= 80) {
+        return "⭐⭐⭐⭐⭐";
     }
-    if (complexity <= 20) {
-        return "MODERATE";
-    }
-    if (complexity <= 30) {
-        return "COMPLEX";
-    }
-    if (complexity <= 40) {
-        return "EXTREMELY COMPLEX";
+    if (complexity >= 60) {
+        return "⭐⭐⭐⭐";
     }
     if (complexity >= 50) {
-        return "INSANE";
+        return "⭐⭐⭐";
     }
-    return "";
+    if (complexity >= 20) {
+        return "⭐⭐";
+    }
+    if (complexity >= 1) {
+        return "⭐";
+    }
+    return "🚫";
 }
-exports.getCyclomaticThresholdDescription = getCyclomaticThresholdDescription;
+exports.getMaintainabilityRemark = getMaintainabilityRemark;
 //# sourceMappingURL=threshold.js.map
