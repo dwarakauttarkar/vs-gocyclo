@@ -1,19 +1,19 @@
 
-export function getCyclomaticThresholdDescription(complexity : number):string{
-    if(complexity <= 10){
-        return "GOOD";
+export function getMaintainabilityRemark(complexity : number):string{
+    if(complexity >= 80){
+        return "⭐⭐⭐⭐⭐"
     }
-    if(complexity <= 20){
-        return "MODERATE";
+    if(complexity >= 60 ){
+        return "⭐⭐⭐⭐";
     }
-    if(complexity <= 30){
-        return "COMPLEX";
+    if(complexity >= 50 ){
+        return "⭐⭐⭐";
     }
-    if(complexity <= 40){
-        return "EXTREMELY COMPLEX";
+    if(complexity >= 20 ){
+        return "⭐⭐";
     }
-    if(complexity >= 50){
-        return "INSANE"
+    if(complexity >= 1){
+        return "⭐";
     }
-    return "";
+    return "🚫";
 }

@@ -2,8 +2,8 @@
 export class Stat  {
     PkgName: string = "";
     FuncName: string = "";
-    Complexity: number = 0;
-    // Pos: FileStat = new FileStat();
+    CyclomaticComplexity: number = 0;
+    MaintainabilityIndex: number = 0;
     Remark: string  = "";
     Name: string = "";
 };
@@ -18,6 +18,7 @@ export class FileStat  {
 export enum Column{
     PKGNAME = 'PkgName',
     FUNCNAME = 'FuncName',
-    COMPLEXITY = 'Complexity',
+    CYCLO_COMPLEXITY = 'CyclomaticComplexity',
+    MAINTAINABILITY_INDEX = 'MaintainabilityIndex',
     REMARK = 'Remark',
 }
