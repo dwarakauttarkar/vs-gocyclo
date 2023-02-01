@@ -4,6 +4,8 @@ All notable changes to the "vs-gocyclo" extension will be documented in this fil
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## 1.0.3
+Cyclomatic complexity available
 
-- Initial release
+## 1.0.4
+Maintainability index in total complexity at function level
