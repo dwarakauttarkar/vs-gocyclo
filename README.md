@@ -1,6 +1,9 @@
-# vs-gocyclo
+# Go Cyclo
 
-This extension provides cyclomatic complexity for a go lang projects
+This extension provides cyclomatic complexity & maintainability index for a go lang projects
+
+### Developed By
+Dwaraka Uttarkar - dwaraka.uttarkar@gmail.com
 
 ### Limitations
 - Currently works only on Mac & Linux.
@@ -51,6 +54,8 @@ This extension provides cyclomatic complexity for a go lang projects
 * Show total Complexity for the current file at function level when the status bar item at the bottom is clicked.
 * New Command "GoCyclo: Get Total Complexity" to generate the function level complexity.
 
+### 1.0.4
+* Showing maintainability index along with cyclomatic complexity in total complexity analysis at function level
 ---
 
 **Enjoy!**
