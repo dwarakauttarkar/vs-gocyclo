@@ -19,9 +19,6 @@ var lastUpdatedTime = new Date().getTime();
 // commands
 const commandToggleStatus = "gocyclo.toggleStatus";
 const commandTotalComplexity = "gocyclo.getTotalComplexity";
-// common constants
-const tempGoPath = "/tmp/tempgopath";
-var goCycloBinaryPath = `${tempGoPath}/bin/gocyclo`;
 var goCycloLibraryGitUrl = "github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest";
 function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", (folderUri) => {
@@ -69,7 +66,7 @@ function updateStatusBarItemWithTimeDelay() {
 }
 function publishAverageComplexityToStatusBar() {
     let currentFilepath = (0, utils_1.getActiveFilePath)();
-    let command = goCycloBinaryPath + " -avg " + currentFilepath;
+    let command = "gocyclo -avg " + currentFilepath;
     child.exec(command, function (error, stdout, stdin) {
         if (error !== undefined) {
             if (categorizeChildProcessError(error) === errors_1.ErrorType.BINARY_NOT_FOUND) {
@@ -106,15 +103,12 @@ function setup() {
     if (terminal === undefined || terminal === null) {
         terminal = vscode.window.createTerminal("GoCyclo");
     }
-    terminal.sendText(`echo $GO111MODULE`, true);
-    terminal.sendText(`mkdir -p ${tempGoPath} && `
-        + `export GO111MODULE=on && `
-        + `export GOPATH=${tempGoPath} && `
+    terminal.sendText(`cd $HOME && export GO111MODULE=on && `
         + `go install ${goCycloLibraryGitUrl}`, true);
     console.log("setup completed");
 }
 function showTotalComplexityInTerminal(currentFilePath = (0, utils_1.getActiveFilePath)()) {
-    let command = goCycloBinaryPath + " -top 10000 -ignore _test.go " + currentFilePath;
+    let command = "gocyclo -top 10000 -ignore _test.go " + currentFilePath;
     child.exec(command, function (error, stdout, stdin) {
         const stats = JSON.parse(stdout);
         for (let i = 0; i < stats.length; i++) {
