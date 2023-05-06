@@ -131,7 +131,7 @@ function setup() {
 
 function showTotalComplexityInTerminal(currentFilePath: string = getActiveFilePath()) {
 
-	let command = goCycloBinaryPath + " -top 1000 " + currentFilePath;
+	let command = goCycloBinaryPath + " -top 10000 -ignore _test.go " + currentFilePath;
 	child.exec(command, function (error, stdout, stdin) {
 		const stats: Stat[] = JSON.parse(stdout);
 		for (let i = 0; i < stats.length; i++) {

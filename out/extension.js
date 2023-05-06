@@ -114,7 +114,7 @@ function setup() {
     console.log("setup completed");
 }
 function showTotalComplexityInTerminal(currentFilePath = (0, utils_1.getActiveFilePath)()) {
-    let command = goCycloBinaryPath + " -top 1000 " + currentFilePath;
+    let command = goCycloBinaryPath + " -top 10000 -ignore _test.go " + currentFilePath;
     child.exec(command, function (error, stdout, stdin) {
         const stats = JSON.parse(stdout);
         for (let i = 0; i < stats.length; i++) {
@@ -130,7 +130,6 @@ function showTotalComplexityInTerminal(currentFilePath = (0, utils_1.getActiveFi
                 stat_1.Column.CYCLO_COMPLEXITY, stat_1.Column.MAINTAINABILITY_INDEX, stat_1.Column.REMARK],
             capitalizeHeaders: true,
         });
-        // console.log("out ", out);
         outputChannel.appendLine(out);
         outputChannel.show();
     });
