@@ -19,11 +19,13 @@ var lastUpdatedTime = new Date().getTime();
 // commands
 const commandToggleStatus = "gocyclo.toggleStatus";
 const commandTotalComplexity = "gocyclo.getTotalComplexity";
-// common constants
-const tempGoPath = "/tmp/tempgopath";
-var goCycloBinaryPath = `${tempGoPath}/bin/gocyclo`;
-var goCycloLibraryGitUrl = "github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest";
+// common constants 
+var goCycloBinaryPath = "";
+// var goCycloLibraryGitUrl = "github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest";
 function activate(context) {
+    const executableName = 'gocyclo';
+    const executablePath = context.asAbsolutePath(`src/bin/${executableName}`);
+    goCycloBinaryPath = executablePath;
     context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", (folderUri) => {
         console.log(folderUri);
         showTotalComplexityInTerminal(folderUri.path);
@@ -35,7 +37,7 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand(commandTotalComplexity, () => {
         showTotalComplexityInTerminal();
     }));
-    setup();
+    // setup();
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
     statusBarItem.tooltip = "Click here to get function level analysis";
@@ -73,14 +75,14 @@ function publishAverageComplexityToStatusBar() {
     child.exec(command, function (error, stdout, stdin) {
         if (error !== undefined) {
             if (categorizeChildProcessError(error) === errors_1.ErrorType.BINARY_NOT_FOUND) {
-                console.error("gocyclo binary not found, initiating the setup. ", error);
-                setup();
+                console.error("gocyclo not found, initiating the setup. ", error);
+                // setup();
             }
         }
         try {
             let avgScoreObj = JSON.parse(stdout);
             averageComplexity = avgScoreObj.average;
-            statusBarItem.text = '$(getting-started-beginner) Avg Cyclomatic: ' + averageComplexity;
+            statusBarItem.text = '$(getting-started-beginner) Average Cyclomatic: ' + averageComplexity;
             statusBarItem.show();
         }
         catch (exception) {
@@ -102,17 +104,17 @@ function categorizeChildProcessError(err) {
     }
     return errors_1.ErrorType.UNKNOWN;
 }
-function setup() {
-    if (terminal === undefined || terminal === null) {
-        terminal = vscode.window.createTerminal("GoCyclo");
-    }
-    terminal.sendText(`echo $GO111MODULE`, true);
-    terminal.sendText(`mkdir -p ${tempGoPath} && `
-        + `export GO111MODULE=on && `
-        + `export GOPATH=${tempGoPath} && `
-        + `go install ${goCycloLibraryGitUrl}`, true);
-    console.log("setup completed");
-}
+// function setup() {
+// 	if(terminal === undefined || terminal === null){
+// 		terminal = vscode.window.createTerminal("GoCyclo");
+// 	}
+// 	terminal.sendText(`echo $GO111MODULE`, true);
+// 	terminal.sendText(`mkdir -p ${tempGoPath} && `
+// 	+ `export GO111MODULE=on && `	
+// 	+ `export GOPATH=${tempGoPath} && `
+// 		+ `go install ${goCycloLibraryGitUrl}`, true);
+// 	console.log("setup completed");
+// }
 function showTotalComplexityInTerminal(currentFilePath = (0, utils_1.getActiveFilePath)()) {
     let command = goCycloBinaryPath + " -top 10000 -ignore _test.go " + currentFilePath;
     child.exec(command, function (error, stdout, stdin) {

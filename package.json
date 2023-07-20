@@ -66,6 +66,9 @@
     "mocha": "^10.1.0",
     "typescript": "^4.9.3"
   },
+  "bin": {
+    "gocyclo": "./bin/gocyclo" 
+  },
   "dependencies": {
     "string-table": "^0.1.5"
   },
