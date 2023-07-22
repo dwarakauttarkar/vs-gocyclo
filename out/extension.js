@@ -23,8 +23,10 @@ const commandTotalComplexity = "gocyclo.getTotalComplexity";
 var goCycloBinaryPath = "";
 // var goCycloLibraryGitUrl = "github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest";
 function activate(context) {
+    //get the os type
     const executableName = 'gocyclo';
-    const executablePath = context.asAbsolutePath(`src/bin/${executableName}`);
+    const osType = process.platform;
+    const executablePath = context.asAbsolutePath(`src/bin/${executableName}-${osType}`);
     goCycloBinaryPath = executablePath;
     context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", (folderUri) => {
         console.log(folderUri);
@@ -37,7 +39,6 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand(commandTotalComplexity, () => {
         showTotalComplexityInTerminal();
     }));
-    // setup();
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
     statusBarItem.tooltip = "Click here to get function level analysis";
@@ -76,7 +77,6 @@ function publishAverageComplexityToStatusBar() {
         if (error !== undefined) {
             if (categorizeChildProcessError(error) === errors_1.ErrorType.BINARY_NOT_FOUND) {
                 console.error("gocyclo not found, initiating the setup. ", error);
-                // setup();
             }
         }
         try {
@@ -104,17 +104,6 @@ function categorizeChildProcessError(err) {
     }
     return errors_1.ErrorType.UNKNOWN;
 }
-// function setup() {
-// 	if(terminal === undefined || terminal === null){
-// 		terminal = vscode.window.createTerminal("GoCyclo");
-// 	}
-// 	terminal.sendText(`echo $GO111MODULE`, true);
-// 	terminal.sendText(`mkdir -p ${tempGoPath} && `
-// 	+ `export GO111MODULE=on && `	
-// 	+ `export GOPATH=${tempGoPath} && `
-// 		+ `go install ${goCycloLibraryGitUrl}`, true);
-// 	console.log("setup completed");
-// }
 function showTotalComplexityInTerminal(currentFilePath = (0, utils_1.getActiveFilePath)()) {
     let command = goCycloBinaryPath + " -top 10000 -ignore _test.go " + currentFilePath;
     child.exec(command, function (error, stdout, stdin) {

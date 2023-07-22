@@ -26,8 +26,10 @@ var goCycloBinaryPath = "";
 // var goCycloLibraryGitUrl = "github.com/dwarakauttarkar/gocyclo/cmd/gocyclo@latest";
  
 export function activate(context: vscode.ExtensionContext) {
+	//get the os type
 	const executableName = 'gocyclo'; 
-	const executablePath = context.asAbsolutePath(`src/bin/${executableName}`);
+	const osType = process.platform;
+	const executablePath = context.asAbsolutePath(`src/bin/${executableName}-${osType}`);
 	goCycloBinaryPath = executablePath;
 	context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", (folderUri: vscode.Uri) => {
 		console.log(folderUri);
@@ -42,8 +44,6 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand(commandTotalComplexity, () => {
 		showTotalComplexityInTerminal();
 	}));
-
-	// setup();
 
 	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 	statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
@@ -89,7 +89,6 @@ function publishAverageComplexityToStatusBar(): Error | null {
 		if (error !== undefined) {
 			if (categorizeChildProcessError(error) === ErrorType.BINARY_NOT_FOUND) {
 				console.error("gocyclo not found, initiating the setup. ", error);
-				// setup();
 			}
 		} 
 		try {
@@ -117,19 +116,6 @@ function categorizeChildProcessError(err: child.ExecException | null): ErrorType
 	}
 	return ErrorType.UNKNOWN;
 }
- 
-// function setup() {
-// 	if(terminal === undefined || terminal === null){
-// 		terminal = vscode.window.createTerminal("GoCyclo");
-// 	}
-// 	terminal.sendText(`echo $GO111MODULE`, true);
-// 	terminal.sendText(`mkdir -p ${tempGoPath} && `
-// 	+ `export GO111MODULE=on && `	
-// 	+ `export GOPATH=${tempGoPath} && `
-// 		+ `go install ${goCycloLibraryGitUrl}`, true);
-// 	console.log("setup completed");
-// }
-
 
 function showTotalComplexityInTerminal(currentFilePath: string = getActiveFilePath()) {
 
