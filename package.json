@@ -2,7 +2,7 @@
   "name": "vs-gocyclo",
   "displayName": "Go Cyclo",
   "description": "Extension for GO language code insights",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -67,7 +67,7 @@
     "typescript": "^4.9.3"
   },
   "bin": {
-    "gocyclo": "./bin/gocyclo" 
+    "gocyclo": "./bin/gocyclo"
   },
   "dependencies": {
     "string-table": "^0.1.5"
