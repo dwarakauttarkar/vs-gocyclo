@@ -31,9 +31,8 @@ export function activate(context: vscode.ExtensionContext) {
 	const osType = process.platform;
 	const executablePath = context.asAbsolutePath(`src/bin/${executableName}-${osType}`);
 	goCycloBinaryPath = executablePath;
-	context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", (folderUri: vscode.Uri) => {
-		console.log(folderUri);
-		showTotalComplexityInTerminal(folderUri.path);
+	context.subscriptions.push(vscode.commands.registerCommand("gocyclo.runGoCycle", () => {
+		showTotalComplexityInTerminal(getActiveWorkspacePath());
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand(commandToggleStatus, () => {
